@@ -49,10 +49,16 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+/.venv
 .venv
+/env
 env
+/.env
 .env
 logs.db
 logs.log
+/config
 config
-
+notes.md
+/notes
+notes
