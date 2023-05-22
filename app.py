@@ -65,6 +65,9 @@ def create_database():
         print(f"Error creating database table: {e}", file=sys.stderr)
 
 
+create_database()
+
+
 def get_summary_from_db(user_input):
     conn = sqlite3.connect("logs.db")
     c = conn.cursor()
@@ -80,6 +83,8 @@ def get_summary_from_db(user_input):
 @app.event("app_mention")
 def handle_mentions(body, say):
     text = body["event"]["text"].replace(BOT_MENTION, "").strip()
+
+    create_database()
 
     command, *args = text.split()
     response = None
@@ -131,7 +136,6 @@ def slack_events():
     return handler.handle(request)
 
 
-create_database()
-
 if __name__ == "__main__":
+    create_database()
     flask_app.run()
