@@ -65,9 +65,6 @@ def create_database():
         print(f"Error creating database table: {e}", file=sys.stderr)
 
 
-create_database()
-
-
 def get_summary_from_db(user_input):
     conn = sqlite3.connect("logs.db")
     c = conn.cursor()
@@ -82,48 +79,36 @@ def get_summary_from_db(user_input):
 
 @app.event("app_mention")
 def handle_mentions(body, say):
+    """
+    Event listener for mentions in Slack.
+    When the bot is mentioned, this function processes the text and sends a response.
+
+    Args:
+        body (dict): The event data received from Slack.
+        say (callable): A function for sending a response to the channel.
+    """
+
     text = body["event"]["text"].replace(BOT_MENTION, "").strip()
 
-    create_database()
+    # mention = f"<@{SLACK_BOT_USER_ID}>"
+    # text = text.replace(mention, "").strip()
 
-    command, *args = text.split()
-    response = None
-
-    # Filter out any None values from args
-    args = [arg for arg in args if arg is not None]
-
-    summary_from_db = get_summary_from_db(" ".join(args)) if args else None
-
-    if summary_from_db:
-        response = summary_from_db
+    if "!draft" in text:
+        say("Drafting...")
+        response = draft_email(text)
+    elif "!summary" in text:
+        say("Summarising...")
+        response = summarise_text(text)
+    elif "!log" in text:
+        say("Logging...")
+        response = log_text(text)
+    elif "!dig" in text:
+        say("Digging...")
+        response = research_text(text)
     else:
-        if command == "!draft":
-            say("Drafting...")
-            response = draft_email(text)
-        elif command == "!summary":
-            say("Summarising...")
-            response = summarise_text(text)
-        elif command == "!log":
-            skip_summary = "!skip" in args
-            print(skip_summary)
-            args = [arg for arg in args if arg != "!skip"]
-            say("Logging...")
-            response = log_text(text, skip_summary)
-        elif command == "!dig":
-            say("Digging...")
-            response = research_text(text)
-        elif command == "!help":
-            help_message = (
-                "Available commands:\n"
-                "!draft <text> - Draft an email based on the input text.\n"
-                "!summary <text> - Summarise and enrich the input text.\n"
-                "!log <text> - Log the input text. Add !skip to skip summary.\n"
-                "!dig <text> - Research the input text."
-            )
-            response = help_message
+        response = my_function(text)
 
-    if response:
-        say(response)
+    say(response)
 
 
 @flask_app.route("/", methods=['GET'])
