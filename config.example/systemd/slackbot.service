@@ -1,0 +1,13 @@
+[Unit]
+Description=Slackbot
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/var/www/vhosts/slack.example.com
+Environment="PATH=/var/www/vhosts/slack.example.com/.venv/bin"
+ExecStart=/var/www/vhosts/slack.example.com/.venv/bin/gunicorn --workers 2 --bind unix:/var/www/vhosts/slack.example.com/slackbot.sock -m 007 app:flask_app
+
+[Install]
+WantedBy=multi-user.target
