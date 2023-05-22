@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import datetime
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, request, Response
@@ -43,21 +44,25 @@ def get_bot_user_id():
 
 
 def create_database():
-    conn = sqlite3.connect("logs.db")
-    c = conn.cursor()
+    try:
+        conn = sqlite3.connect("logs.db")
+        c = conn.cursor()
 
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS log_entries (
-            id INTEGER PRIMARY KEY,
-            timestamp TEXT,
-            text TEXT,
-            summary TEXT,
-            tags TEXT
-        )
-    """)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS log_entries (
+                id INTEGER PRIMARY KEY,
+                timestamp TEXT,
+                text TEXT,
+                summary TEXT,
+                tags TEXT
+            )
+        """)
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
+        print("Database table created successfully.")
+    except Exception as e:
+        print(f"Error creating database table: {e}", file=sys.stderr)
 
 
 def get_summary_from_db(user_input):
@@ -76,13 +81,14 @@ def get_summary_from_db(user_input):
 def handle_mentions(body, say):
     text = body["event"]["text"].replace(BOT_MENTION, "").strip()
 
-    command, *args = text.split()
+    if not text:
+        command = "!help"
+    else:
+        command, *args = text.split()
+
     response = None
 
-    if args:
-        summary_from_db = get_summary_from_db(" ".join(args))
-    else:
-        summary_from_db = None
+    summary_from_db = get_summary_from_db(" ".join(args)) if args else None
 
     if summary_from_db:
         response = summary_from_db
