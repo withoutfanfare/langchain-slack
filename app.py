@@ -76,10 +76,13 @@ def get_summary_from_db(user_input):
 def handle_mentions(body, say):
     text = body["event"]["text"].replace(BOT_MENTION, "").strip()
 
-    command, *args = (text.split() + [None])[:2]
+    command, *args = text.split()
     response = None
 
-    summary_from_db = get_summary_from_db(" ".join(args)) if args else None
+    if args:
+        summary_from_db = get_summary_from_db(" ".join(args))
+    else:
+        summary_from_db = None
 
     if summary_from_db:
         response = summary_from_db
@@ -99,7 +102,7 @@ def handle_mentions(body, say):
         elif command == "!dig":
             say("Digging...")
             response = research_text(" ".join(args))
-        elif command == "!help" or command is None:
+        elif command == "!help":
             help_message = (
                 "Available commands:\n"
                 "!draft <text> - Draft an email based on the input text.\n"
