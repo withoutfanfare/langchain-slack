@@ -99,19 +99,19 @@ def handle_mentions(body, say):
     else:
         if command == "!draft":
             say("Drafting...")
-            response = draft_email(" ".join(args))
+            response = draft_email(text)
         elif command == "!summary":
             say("Summarising...")
-            response = summarise_text(" ".join(args))
+            response = summarise_text(text)
         elif command == "!log":
             skip_summary = "!skip" in args
             print(skip_summary)
             args = [arg for arg in args if arg != "!skip"]
             say("Logging...")
-            response = log_text(" ".join(args), skip_summary)
+            response = log_text(text, skip_summary)
         elif command == "!dig":
             say("Digging...")
-            response = research_text(" ".join(args))
+            response = research_text(text)
         elif command == "!help":
             help_message = (
                 "Available commands:\n"
