@@ -81,12 +81,11 @@ def get_summary_from_db(user_input):
 def handle_mentions(body, say):
     text = body["event"]["text"].replace(BOT_MENTION, "").strip()
 
-    if not text:
-        command = "!help"
-    else:
-        command, *args = text.split()
-
+    command, *args = text.split()
     response = None
+
+    # Filter out any None values from args
+    args = [arg for arg in args if arg is not None]
 
     summary_from_db = get_summary_from_db(" ".join(args)) if args else None
 
@@ -132,6 +131,7 @@ def slack_events():
     return handler.handle(request)
 
 
+create_database()
+
 if __name__ == "__main__":
-    create_database()
     flask_app.run()
