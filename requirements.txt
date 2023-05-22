@@ -6,3 +6,4 @@ slack-bolt
 flask
 azure-core
 datetime
+gunicorn
